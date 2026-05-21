@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitGenius — персональные планы питания и тренировок за 2 минуты. Учитываем тип диеты, параметры тела и ограничения по здоровью.">
+  <title>FitGenius — Персональное питание и тренировки</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- AOS (Animate On Scroll) -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    button { font-family: inherit; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; background: var(--primary); color: #fff; font-weight: 700; border-radius: 12px; transition: var(--transition); border: none; cursor: pointer; font-size: 1rem; }
+    .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { font-weight: 500; transition: var(--transition); padding: 4px 0; }
+    .nav-links a:hover { color: var(--primary); border-bottom: 2px solid var(--primary); }
+    .menu-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+
+    /* Hero */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      /* ВСТАВЬ ССЫЛКУ НА КАРТИНКУ ВНУТРЬ url('') НИЖЕ */
+      background: url('') center/cover no-repeat;
+      background-color: #0b1120;
+    }
+    #hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,23,42,0.75) 0%, var(--bg) 100%); }
+    .hero-content { position: relative; z-index: 2; padding: 20px; max-width: 800px; }
+    h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
+    .hero-content p { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-muted); margin-bottom: 32px; }
+
+    /* Sections */
+    section { padding: 80px 0; }
+    h2 { font-size: clamp(2rem, 4vw, 2.5rem); margin-bottom: 16px; text-align: center; }
+    .section-sub { text-align: center; color: var(--text-muted); max-width: 700px; margin: 0 auto 48px; font-size: 1.1rem; }
+
+    /* Journey (A -> B) */
+    .journey { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: center; margin-top: 32px; }
+    .step { background: var(--card); padding: 28px; border-radius: var(--radius); text-align: center; flex: 1; min-width: 250px; border: 1px solid var(--border); transition: var(--transition); }
+    .step:hover { transform: translateY(-4px); border-color: var(--primary); }
+    .step h3 { margin: 12px 0 8px; font-size: 1.2rem; }
+    .step p { color: var(--text-muted); font-size: 0.95rem; }
+    .arrow { font-size: 2rem; color: var(--primary); transform: rotate(90deg); margin: 0 10px; opacity: 0.6; }
+    @media(min-width: 768px) { .arrow { transform: rotate(0); } }
+
+    /* Cards Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .card { background: var(--card); padding: 28px; border-radius: var(--radius); border: 1px solid var(--border); transition: var(--transition); position: relative; overflow: hidden; }
+    .card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); transform: scaleX(0); transition: transform 0.3s ease; transform-origin: left; }
+    .card:hover::after { transform: scaleX(1); }
+    .card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: var(--shadow); }
+    .card i { font-size: 2rem; color: var(--primary); margin-bottom: 16px; display: block; }
+    .card h3 { margin-bottom: 10px; font-size: 1.3rem; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Advantages */
+    .adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; align-items: center; }
+    .adv-list li { margin-bottom: 16px; display: flex; gap: 12px; align-items: flex-start; font-size: 1.05rem; }
+    .adv-list li i { color: var(--primary); margin-top: 4px; flex-shrink: 0; }
+    .adv-img { width: 100%; height: 320px; background: var(--card); border-radius: var(--radius); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); border: 2px dashed var(--border); }
+    .adv-img i { font-size: 3rem; margin-bottom: 10px; opacity: 0.3; }
+
+    /* FAQ */
+    .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .faq-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; color: var(--text); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 8px 0; text-align: left; }
+    .faq-btn:hover { color: var(--primary); }
+    .faq-btn i { transition: transform 0.3s; }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; color: var(--text-muted); padding: 0 8px; }
+    .faq-item.open .faq-answer { max-height: 250px; padding-top: 12px; }
+    .faq-item.open .faq-btn i { transform: rotate(180deg); }
+
+    /* Pricing */
+    .price-card { background: var(--card); border: 2px solid var(--primary); border-radius: var(--radius); padding: 40px; max-width: 450px; margin: 0 auto; text-align: center; box-shadow: var(--shadow); transition: var(--transition); }
+    .price-card:hover { transform: scale(1.02); }
+    .price { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 16px 0; }
+    .price span { font-size: 1.2rem; color: var(--text-muted); font-weight: 400; }
+    .price-features { text-align: left; margin: 24px 0; padding-left: 10px; }
+    .price-features li { margin-bottom: 12px; display: flex; gap: 10px; }
+    .price-features li i { color: var(--primary); margin-top: 4px; }
+
+    /* Footer */
+    footer { background: #0b1120; padding: 40px 0 20px; border-top: 1px solid var(--border); text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-links a:hover { color: var(--primary); }
+    .copyright { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* To Top */
+    #toTop { position: fixed; bottom: 30px; right: 30px; width: 48px; height: 48px; background: var(--primary); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    #toTop.visible { opacity: 1; visibility: visible; }
+    #toTop:hover { transform: translateY(-3px); background: var(--primary-hover); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { position: fixed; top: 60px; left: 0; right: 0; background: var(--bg); flex-direction: column; padding: 20px; gap: 16px; transform: translateY(-150%); transition: transform 0.3s ease; border-bottom: 1px solid var(--border); }
+      .nav-links.active { transform: translateY(0); }
+      .menu-toggle { display: block; }
+      .arrow { transform: rotate(90deg); margin: 10px auto; display: block; width: fit-content; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav aria-label="Главная навигация">
+    <div class="container nav-inner">
+      <a href="#" class="logo"><i class="fa-solid fa-bolt"></i> FitGenius</a>
+      <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+      <div class="nav-links">
+        <a href="#about">О приложении</a>
+        <a href="#features">Функции</a>
+        <a href="#faq">FAQ</a>
+        <a href="#pricing">Цены</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="hero" role="banner">
+    <div class="hero-content" data-aos="fade-up">
+      <h1>Питание и тренировки, созданные под тебя</h1>
+      <p>Введи параметры, выбери тип питания и получи персональный план на неделю. Без диетологов, абонементов и догадок.</p>
+      <a href="#about" class="btn">Узнать больше <i class="fa-solid fa-arrow-down" style="margin-left: 8px;"></i></a>
+    </div>
+  </header>
+
+  <main>
+    <!-- About & Journey -->
+    <section id="about" aria-label="О приложении">
+      <div class="container">
+        <h2 data-aos="fade-up">Как это работает</h2>
+        <p class="section-sub" data-aos="fade-up" data-aos-delay="100">FitGenius анализирует твои данные, цели и ограничения, чтобы собрать идеальный рацион и программу тренировок за 2 минуты.</p>
+        <div class="journey" data-aos="fade-up" data-aos-delay="200">
+          <div class="step">
+            <i class="fa-solid fa-user-xmark" style="font-size: 2rem; color: #ef4444; margin-bottom: 10px;"></i>
+            <h3>Точка А</h3>
+            <p>Хаотичное питание, отсутствие результата, нехватка времени на составление плана, риски для здоровья.</p>
+          </div>
+          <div class="arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="step">
+            <i class="fa-solid fa-sliders" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+            <h3>Настройка</h3>
+            <p>Рост, вес, возраст, пол, тип питания (веган/кето/смешанное), медицинские ограничения. Алгоритм учитывает всё.</p>
+          </div>
+          <div class="arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="step">
+            <i class="fa-solid fa-bullseye" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+            <h3>Точка Б</h3>
+            <p>Готовый план питания и тренировок на неделю. Чёткие шаги, безопасные нагрузки, видимый прогресс.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" aria-label="Функции приложения">
+      <div class="container">
+        <h2 data-aos="fade-up">Всё, что нужно для результата</h2>
+        <p class="section-sub" data-aos="fade-up">Каждая функция разработана с учётом реальных ограничений и целей пользователей.</p>
+        <div class="grid">
+          <div class="card" data-aos="fade-up" data-aos-delay="100">
+            <i class="fa-solid fa-bowl-food"></i>
+            <h3>4 режима питания</h3>
+            <p>Веганство, вегетарианство, кето или сбалансированное меню. Алгоритм автоматически пересчитает КБЖУ и подберёт рецепты.</p>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <i class="fa-solid fa-dumbbell"></i>
+            <h3>Дом или зал?</h3>
+            <p>Выбери локацию. Приложение адаптирует упражнения под доступное оборудование и твой уровень подготовки.</p>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="300">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <h3>Учёт ограничений</h3>
+            <p>Аллергии, проблемы с ЖКТ, травмы суставов? План скорректируется, чтобы тренировки были безопасными.</p>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="400">
+            <i class="fa-solid fa-calendar-check"></i>
+            <h3>План на 7 дней</h3>
+            <p>Готовое меню с рецептами + программа тренировок по дням. Экспорт в PDF или синхронизация с календарём.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advantages -->
+    <section id="why-us" aria-label="Преимущества">
+      <div class="container">
+        <h2 data-aos="fade-up">Почему FitGenius лучше аналогов</h2>
+        <div class="adv-grid">
+          <div class="adv-list" data-aos="fade-right">
+            <ul>
+              <li><i class="fa-solid fa-check-circle"></i> <span><strong>Не просто калькулятор КБЖУ.</strong> Мы даём готовый план с рецептами и видео-демонстрацией упражнений.</span></li>
+              <li><i class="fa-solid fa-check-circle"></i> <span><strong>Без подписок за 1000₽/мес.</strong> Доступ к полному функционалу от 100 рублей. Честная цена без скрытых платежей.</span></li>
+              <li><i class="fa-solid fa-check-circle"></i> <span><strong>Умная адаптация.</strong> Если нет времени на час в зале, алгоритм заменит тренировку на 20-минутный HIIT дома.</span></li>
+              <li><i class="fa-solid fa-check-circle"></i> <span><strong>Приватность.</strong> Данные не продаются рекламодателям. Всё хранится в зашифрованном виде.</span></li>
+            </ul>
+          </div>
+          <div class="adv-img" data-aos="fade-left">
+            <i class="fa-solid fa-mobile-screen"></i>
+            <p style="margin-top: 12px;">[Место для скриншота приложения]</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="reviews" aria-label="Отзывы">
+      <div class="container">
+        <h2 data-aos="fade-up">Что говорят пользователи</h2>
+        <div class="grid">
+          <div class="card" data-aos="fade-up" data-aos-delay="100">
+            <p>“Наконец-то не нужно листать 10 сайтов. Ввёл данные, выбрал кето, получил меню на неделю. Скинул 2 кг за 14 дней без голода.”</p>
+            <div style="margin-top: 16px; font-weight: 600; color: var(--primary);">— Алексей, 24 года</div>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <p>“Тренируюсь дома с гантелями. Приложение идеально подогнало нагрузку под мой график и ограничения по спине. Рекомендую!”</p>
+            <div style="margin-top: 16px; font-weight: 600; color: var(--primary);">— Мария, 21 год</div>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="300">
+            <p>“Веганское меню было сложным, пока не нашла этот сервис. Теперь у меня чёткий план покупок и рецепты на каждый день.”</p>
+            <div style="margin-top: 16px; font-weight: 600; color: var(--primary);">— Дарья, 27 лет</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" aria-label="Часто задаваемые вопросы">
+      <div class="container" style="max-width: 800px;">
+        <h2 data-aos="fade-up">Ответы на вопросы</h2>
+        <div class="faq-item" data-aos="fade-up">
+          <button class="faq-btn" aria-expanded="false">Нужно ли скачивать приложение? <i class="fa-solid fa-chevron-down"></i></button>
+          <div class="faq-answer"><p>Нет, FitGenius работает прямо в браузере. Ты получаешь доступ мгновенно с любого устройства.</p></div>
+        </div>
+        <div class="faq-item" data-aos="fade-up">
+          <button class="faq-btn" aria-expanded="false">Как учитываются медицинские ограничения? <i class="fa-solid fa-chevron-down"></i></button>
+          <div class="faq-answer"><p>Алгоритм использует проверенные рекомендации ВОЗ и спортивные протоколы. При серьёзных заболеваниях рекомендуем консультацию врача.</p></div>
+        </div>
+        <div class="faq-item" data-aos="fade-up">
+          <button class="faq-btn" aria-expanded="false">Можно ли изменить план после генерации? <i class="fa-solid fa-chevron-down"></i></button>
+          <div class="faq-answer"><p>Да, вы можете вносить правки вручную или перегенерировать план с новыми параметрами в любой момент.</p></div>
+        </div>
+        <div class="faq-item" data-aos="fade-up">
+          <button class="faq-btn" aria-expanded="false">Есть ли возврат средств? <i class="fa-solid fa-chevron-down"></i></button>
+          <div class="faq-answer"><p>Да, если план не соответствует заявленным параметрам, мы вернём 100₽ в течение 24 часов после покупки.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" aria-label="Тарифы">
+      <div class="container">
+        <h2 data-aos="fade-up">Получи свой план прямо сейчас</h2>
+        <div class="price-card" data-aos="zoom-in">
+          <h3>Персональный план на 7 дней</h3>
+          <div class="price">100 ₽ <span>/ навсегда</span></div>
+          <ul class="price-features">
+            <li><i class="fa-solid fa-check"></i> Адаптивное меню под твой тип питания</li>
+            <li><i class="fa-solid fa-check"></i> Программа тренировок (дом/зал)</li>
+            <li><i class="fa-solid fa-check"></i> Список покупок и чек-листы</li>
+            <li><i class="fa-solid fa-check"></i> PDF-экспорт и календарная интеграция</li>
+          </ul>
+          <!-- ВСТАВЬ СВОЮ ССЫЛКУ НА ОПЛАТУ ВНУТРЬ href="" НИЖЕ -->
+          <a href="#" class="btn" style="width: 100%;" aria-label="Перейти к оплате">Оплатить и получить план</a>
+          <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">Безопасная оплата. Мгновенный доступ.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer aria-label="Подвал сайта">
+    <div class="container">
+      <div class="footer-links">
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Публичная оферта</a>
+        <a href="#">Поддержка</a>
+      </div>
+      <p class="copyright">© 2026 FitGenius. Все права защищены. Не является медицинской услугой.</p>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button id="toTop" aria-label="Вернуться наверх"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    // Init AOS
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('active');
+      menuToggle.setAttribute('aria-expanded', isOpen);
+      menuToggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    });
+
+    // Close menu on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      });
+    });
+
+    // FAQ Accordion
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const isOpen = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen);
+      });
+    });
+
+    // Scroll to Top Button
+    const toTopBtn = document.getElementById('toTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        toTopBtn.classList.add('visible');
+      } else {
+        toTopBtn.classList.remove('visible');
+      }
+    });
+    toTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
